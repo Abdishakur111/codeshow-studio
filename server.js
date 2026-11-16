@@ -52,7 +52,7 @@ function requireAdmin(req, res, next) {
   try {
     req.admin = jwt.verify(
       token,
-      process.env.sirta_waaye
+      process.env.aniga_waaye
     );
 
     next();
@@ -79,15 +79,15 @@ app.post("/api/admin/login", loginLimit, (req, res) => {
   const { password } = req.body;
 
   if (
-    !process.env.aniga_waaye ||
-    !process.env.sirta_waaye
+    !process.env.sirta_waaye ||
+    !process.env.aniga_waaye
   ) {
     return res.status(503).json({
       error: "Admin security is not configured"
     });
   }
 
-  if (password !== process.env.aniga_waaye) {
+  if (password !== process.env.sirta_waaye) {
     return res.status(401).json({
       error: "Incorrect password"
     });
@@ -95,7 +95,7 @@ app.post("/api/admin/login", loginLimit, (req, res) => {
 
   const token = jwt.sign(
     { role: "admin" },
-    process.env.sirta_waaye,
+    process.env.aniga_waaye,
     { expiresIn: "8h" }
   );
 
