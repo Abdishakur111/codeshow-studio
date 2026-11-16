@@ -7,9 +7,7 @@
 <title>CodeShow Studio | Admin</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   margin: 0;
@@ -17,15 +15,13 @@ body {
   background: #10131c;
   color: white;
   font-family: Arial, sans-serif;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   padding: 20px;
 }
 
 .container {
   width: 100%;
   max-width: 430px;
+  margin: 50px auto;
   background: #1b2231;
   padding: 28px;
   border-radius: 14px;
@@ -39,14 +35,9 @@ body {
   text-align: center;
 }
 
-h2 {
-  text-align: center;
-}
+h2, .subtitle { text-align: center; }
 
-p {
-  color: #aeb9ca;
-  text-align: center;
-}
+p { color: #aeb9ca; }
 
 input {
   width: 100%;
@@ -68,17 +59,18 @@ button {
   border-radius: 7px;
   font-weight: bold;
   cursor: pointer;
+  margin-top: 10px;
 }
 
-#message {
-  color: #ff7777;
-  margin-top: 12px;
-}
+button:disabled { opacity: 0.6; }
+
+#message { color: #ff7777; }
 
 #dashboard {
   display: none;
   width: 100%;
   max-width: 850px;
+  margin: 25px auto;
 }
 
 .cards {
@@ -95,9 +87,7 @@ button {
   border: 1px solid #39465d;
 }
 
-.card h3 {
-  color: #69d7ff;
-}
+.card h3 { color: #69d7ff; }
 
 .value {
   font-size: 25px;
@@ -112,9 +102,16 @@ button {
   line-height: 1.6;
 }
 
-.logout {
-  background: #a83c48;
-  margin-top: 15px;
+#status {
+  text-align: center;
+  color: #aeb9ca;
+  margin: 15px 0;
+}
+
+.logout { background: #a83c48; }
+
+@media(max-width: 450px) {
+  .cards { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -124,7 +121,7 @@ button {
 <div class="container" id="login">
   <div class="logo">CodeShow Studio</div>
   <h2>Admin Login</h2>
-  <p>Private administration area</p>
+  <p class="subtitle">Private administration area</p>
 
   <form id="loginForm">
     <input
@@ -134,8 +131,7 @@ button {
       required
       autocomplete="current-password"
     >
-
-    <button type="submit">Login</button>
+    <button id="loginButton" type="submit">Login</button>
   </form>
 
   <p id="message"></p>
@@ -144,32 +140,38 @@ button {
 <div id="dashboard">
   <div class="logo">CodeShow Studio Admin</div>
   <h2>Admin Dashboard</h2>
-  <p>Welcome to your administration panel.</p>
+  <p class="subtitle">Welcome to your administration panel.</p>
+
+  <div id="status">Checking database...</div>
+
+  <button id="refreshButton" onclick="loadStats()">
+    Refresh Dashboard
+  </button>
 
   <div class="cards">
 
     <div class="card">
       <h3>Total Users</h3>
-      <div class="value">—</div>
-      <p>Database connection pending</p>
+      <div class="value" id="totalUsers">—</div>
+      <p>Registered users</p>
     </div>
 
     <div class="card">
       <h3>Premium Members</h3>
-      <div class="value">—</div>
-      <p>Subscription connection pending</p>
+      <div class="value" id="premiumMembers">—</div>
+      <p>Active subscriptions</p>
     </div>
 
     <div class="card">
       <h3>Revenue</h3>
-      <div class="value">£—</div>
-      <p>Payment connection pending</p>
+      <div class="value" id="revenue">£—</div>
+      <p>Recorded payments</p>
     </div>
 
     <div class="card">
       <h3>Advertisements</h3>
-      <div class="value">—</div>
-      <p>Advertising management pending</p>
+      <div class="value" id="advertisements">—</div>
+      <p>Total advertisements</p>
     </div>
 
   </div>
@@ -177,9 +179,9 @@ button {
   <div class="note">
     <strong>Admin controls</strong>
     <p>
-      User management, Premium subscriptions,
-      payments and advertisements will be connected
-      after the database and payment systems are built.
+      Dashboard statistics are loaded from the backend.
+      User management, payment management and advertising
+      controls will be added in the next stages.
     </p>
   </div>
 
@@ -190,10 +192,12 @@ button {
 const loginBox = document.getElementById("login");
 const dashboard = document.getElementById("dashboard");
 const message = document.getElementById("message");
+const statusBox = document.getElementById("status");
 
 function showDashboard() {
   loginBox.style.display = "none";
   dashboard.style.display = "block";
+  loadStats();
 }
 
 async function checkLogin() {
@@ -215,6 +219,8 @@ document.getElementById("loginForm").addEventListener(
   async function(event) {
     event.preventDefault();
 
+    const loginButton = document.getElementById("loginButton");
+    loginButton.disabled = true;
     message.textContent = "Checking password...";
 
     try {
@@ -240,19 +246,69 @@ document.getElementById("loginForm").addEventListener(
 
     } catch (error) {
       message.textContent = "Server connection failed.";
+    } finally {
+      loginButton.disabled = false;
     }
   }
 );
 
-async function logout() {
-  await fetch("/api/admin/logout", {
-    method: "POST",
-    credentials: "same-origin"
-  });
+async function loadStats() {
+  const refreshButton = document.getElementById("refreshButton");
 
-  dashboard.style.display = "none";
-  loginBox.style.display = "block";
-  document.getElementById("password").value = "";
+  refreshButton.disabled = true;
+  statusBox.textContent = "Loading dashboard data...";
+
+  try {
+    const response = await fetch("/api/admin/stats", {
+      credentials: "same-origin"
+    });
+
+    const data = await response.json();
+
+    if (response.status === 401) {
+      dashboard.style.display = "none";
+      loginBox.style.display = "block";
+      message.textContent = "Please log in again.";
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error(data.error || "Could not load data.");
+    }
+
+    document.getElementById("totalUsers").textContent =
+      Number(data.totalUsers).toLocaleString();
+
+    document.getElementById("premiumMembers").textContent =
+      Number(data.premiumMembers).toLocaleString();
+
+    document.getElementById("revenue").textContent =
+      "£" + Number(data.revenueGBP).toFixed(2);
+
+    document.getElementById("advertisements").textContent =
+      Number(data.advertisements).toLocaleString();
+
+    statusBox.textContent = "Dashboard data loaded successfully.";
+
+  } catch (error) {
+    statusBox.textContent = "Error: " + error.message;
+  } finally {
+    refreshButton.disabled = false;
+  }
+}
+
+async function logout() {
+  try {
+    await fetch("/api/admin/logout", {
+      method: "POST",
+      credentials: "same-origin"
+    });
+  } finally {
+    dashboard.style.display = "none";
+    loginBox.style.display = "block";
+    document.getElementById("password").value = "";
+    message.textContent = "";
+  }
 }
 
 checkLogin();
