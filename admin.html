@@ -11,21 +11,10 @@
 
 body {
   margin: 0;
-  min-height: 100vh;
+  padding: 20px;
   background: #10131c;
   color: white;
   font-family: Arial, sans-serif;
-  padding: 20px;
-}
-
-.container {
-  width: 100%;
-  max-width: 430px;
-  margin: 50px auto;
-  background: #1b2231;
-  padding: 28px;
-  border-radius: 14px;
-  border: 1px solid #39465d;
 }
 
 .logo {
@@ -33,6 +22,15 @@ body {
   font-size: 25px;
   font-weight: bold;
   text-align: center;
+}
+
+.container {
+  max-width: 430px;
+  margin: 50px auto;
+  padding: 28px;
+  background: #1b2231;
+  border: 1px solid #39465d;
+  border-radius: 14px;
 }
 
 h2, .subtitle { text-align: center; }
@@ -51,25 +49,26 @@ input {
 }
 
 button {
-  width: 100%;
-  padding: 13px;
+  padding: 12px 16px;
   background: #168fc0;
   color: white;
   border: 0;
   border-radius: 7px;
-  font-weight: bold;
   cursor: pointer;
-  margin-top: 10px;
+  font-weight: bold;
 }
 
-button:disabled { opacity: 0.6; }
+button:disabled { opacity: .6; }
+
+#loginButton, .full {
+  width: 100%;
+}
 
 #message { color: #ff7777; }
 
 #dashboard {
   display: none;
-  width: 100%;
-  max-width: 850px;
+  max-width: 1000px;
   margin: 25px auto;
 }
 
@@ -80,11 +79,11 @@ button:disabled { opacity: 0.6; }
   margin: 25px 0;
 }
 
-.card {
+.card, .panel {
   background: #1b2231;
-  padding: 22px;
-  border-radius: 10px;
+  padding: 20px;
   border: 1px solid #39465d;
+  border-radius: 10px;
 }
 
 .card h3 { color: #69d7ff; }
@@ -94,23 +93,55 @@ button:disabled { opacity: 0.6; }
   font-weight: bold;
 }
 
-.note {
-  background: #252f42;
-  padding: 15px;
-  border-radius: 8px;
-  color: #c6d2e5;
-  line-height: 1.6;
-}
-
 #status {
   text-align: center;
   color: #aeb9ca;
   margin: 15px 0;
 }
 
+.panel { margin-top: 25px; }
+
+.panel h2 {
+  text-align: left;
+  color: #69d7ff;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 650px;
+}
+
+th, td {
+  padding: 13px;
+  border-bottom: 1px solid #39465d;
+  text-align: left;
+  font-size: 14px;
+}
+
+th { color: #69d7ff; }
+
+.empty {
+  text-align: center;
+  color: #aeb9ca;
+  padding: 25px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+}
+
 .logout { background: #a83c48; }
 
 @media(max-width: 450px) {
+  body { padding: 12px; }
   .cards { grid-template-columns: 1fr; }
 }
 </style>
@@ -138,15 +169,11 @@ button:disabled { opacity: 0.6; }
 </div>
 
 <div id="dashboard">
+
   <div class="logo">CodeShow Studio Admin</div>
   <h2>Admin Dashboard</h2>
-  <p class="subtitle">Welcome to your administration panel.</p>
 
-  <div id="status">Checking database...</div>
-
-  <button id="refreshButton" onclick="loadStats()">
-    Refresh Dashboard
-  </button>
+  <div id="status">Loading...</div>
 
   <div class="cards">
 
@@ -176,16 +203,37 @@ button:disabled { opacity: 0.6; }
 
   </div>
 
-  <div class="note">
-    <strong>Admin controls</strong>
-    <p>
-      Dashboard statistics are loaded from the backend.
-      User management, payment management and advertising
-      controls will be added in the next stages.
-    </p>
+  <div class="panel">
+    <h2>Users Management</h2>
+    <p>Registered CodeShow Studio users</p>
+
+    <div class="actions">
+      <button id="refreshUsers">Refresh Users</button>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Email</th>
+            <th>Registered</th>
+            <th>Last Sign In</th>
+          </tr>
+        </thead>
+        <tbody id="usersTable">
+          <tr>
+            <td colspan="3" class="empty">Loading users...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 
-  <button class="logout" onclick="logout()">Logout</button>
+  <div class="actions">
+    <button id="refreshDashboard">Refresh Dashboard</button>
+    <button class="logout" id="logoutButton">Logout</button>
+  </div>
+
 </div>
 
 <script>
@@ -193,11 +241,13 @@ const loginBox = document.getElementById("login");
 const dashboard = document.getElementById("dashboard");
 const message = document.getElementById("message");
 const statusBox = document.getElementById("status");
+const usersTable = document.getElementById("usersTable");
 
 function showDashboard() {
   loginBox.style.display = "none";
   dashboard.style.display = "block";
   loadStats();
+  loadUsers();
 }
 
 async function checkLogin() {
@@ -219,8 +269,8 @@ document.getElementById("loginForm").addEventListener(
   async function(event) {
     event.preventDefault();
 
-    const loginButton = document.getElementById("loginButton");
-    loginButton.disabled = true;
+    const button = document.getElementById("loginButton");
+    button.disabled = true;
     message.textContent = "Checking password...";
 
     try {
@@ -247,15 +297,12 @@ document.getElementById("loginForm").addEventListener(
     } catch (error) {
       message.textContent = "Server connection failed.";
     } finally {
-      loginButton.disabled = false;
+      button.disabled = false;
     }
   }
 );
 
 async function loadStats() {
-  const refreshButton = document.getElementById("refreshButton");
-
-  refreshButton.disabled = true;
   statusBox.textContent = "Loading dashboard data...";
 
   try {
@@ -266,14 +313,12 @@ async function loadStats() {
     const data = await response.json();
 
     if (response.status === 401) {
-      dashboard.style.display = "none";
-      loginBox.style.display = "block";
-      message.textContent = "Please log in again.";
+      logout();
       return;
     }
 
     if (!response.ok) {
-      throw new Error(data.error || "Could not load data.");
+      throw new Error(data.error || "Could not load statistics.");
     }
 
     document.getElementById("totalUsers").textContent =
@@ -291,11 +336,86 @@ async function loadStats() {
     statusBox.textContent = "Dashboard data loaded successfully.";
 
   } catch (error) {
-    statusBox.textContent = "Error: " + error.message;
-  } finally {
-    refreshButton.disabled = false;
+    statusBox.textContent = "Dashboard error: " + error.message;
   }
 }
+
+async function loadUsers() {
+  usersTable.innerHTML =
+    '<tr><td colspan="3" class="empty">Loading users...</td></tr>';
+
+  try {
+    const response = await fetch("/api/admin/users", {
+      credentials: "same-origin"
+    });
+
+    const data = await response.json();
+
+    if (response.status === 401) {
+      logout();
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error(data.error || "Could not load users.");
+    }
+
+    usersTable.innerHTML = "";
+
+    if (!data.users || data.users.length === 0) {
+      usersTable.innerHTML =
+        '<tr><td colspan="3" class="empty">No registered users yet.</td></tr>';
+      return;
+    }
+
+    data.users.forEach(user => {
+      const row = document.createElement("tr");
+
+      const email = document.createElement("td");
+      email.textContent = user.email || "No email";
+
+      const registered = document.createElement("td");
+      registered.textContent = formatDate(user.created_at);
+
+      const lastSignIn = document.createElement("td");
+      lastSignIn.textContent = formatDate(user.last_sign_in_at);
+
+      row.append(email, registered, lastSignIn);
+      usersTable.appendChild(row);
+    });
+
+  } catch (error) {
+    usersTable.innerHTML = "";
+
+    const row = document.createElement("tr");
+    const cell = document.createElement("td");
+    cell.colSpan = 3;
+    cell.className = "empty";
+    cell.textContent = "Users error: " + error.message;
+
+    row.appendChild(cell);
+    usersTable.appendChild(row);
+  }
+}
+
+function formatDate(date) {
+  if (!date) return "Never";
+
+  return new Date(date).toLocaleString();
+}
+
+document.getElementById("refreshUsers").addEventListener(
+  "click",
+  loadUsers
+);
+
+document.getElementById("refreshDashboard").addEventListener(
+  "click",
+  function() {
+    loadStats();
+    loadUsers();
+  }
+);
 
 async function logout() {
   try {
@@ -310,6 +430,11 @@ async function logout() {
     message.textContent = "";
   }
 }
+
+document.getElementById("logoutButton").addEventListener(
+  "click",
+  logout
+);
 
 checkLogin();
 </script>
