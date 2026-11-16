@@ -1,0 +1,262 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeShow Studio | Admin</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: #10131c;
+  color: white;
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.container {
+  width: 100%;
+  max-width: 430px;
+  background: #1b2231;
+  padding: 28px;
+  border-radius: 14px;
+  border: 1px solid #39465d;
+}
+
+.logo {
+  color: #69d7ff;
+  font-size: 25px;
+  font-weight: bold;
+  text-align: center;
+}
+
+h2 {
+  text-align: center;
+}
+
+p {
+  color: #aeb9ca;
+  text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  margin: 12px 0;
+  background: #090d16;
+  border: 1px solid #39465d;
+  border-radius: 7px;
+  color: white;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 13px;
+  background: #168fc0;
+  color: white;
+  border: 0;
+  border-radius: 7px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+#message {
+  color: #ff7777;
+  margin-top: 12px;
+}
+
+#dashboard {
+  display: none;
+  width: 100%;
+  max-width: 850px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 15px;
+  margin: 25px 0;
+}
+
+.card {
+  background: #1b2231;
+  padding: 22px;
+  border-radius: 10px;
+  border: 1px solid #39465d;
+}
+
+.card h3 {
+  color: #69d7ff;
+}
+
+.value {
+  font-size: 25px;
+  font-weight: bold;
+}
+
+.note {
+  background: #252f42;
+  padding: 15px;
+  border-radius: 8px;
+  color: #c6d2e5;
+  line-height: 1.6;
+}
+
+.logout {
+  background: #a83c48;
+  margin-top: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container" id="login">
+  <div class="logo">CodeShow Studio</div>
+  <h2>Admin Login</h2>
+  <p>Private administration area</p>
+
+  <form id="loginForm">
+    <input
+      id="password"
+      type="password"
+      placeholder="Enter admin password"
+      required
+      autocomplete="current-password"
+    >
+
+    <button type="submit">Login</button>
+  </form>
+
+  <p id="message"></p>
+</div>
+
+<div id="dashboard">
+  <div class="logo">CodeShow Studio Admin</div>
+  <h2>Admin Dashboard</h2>
+  <p>Welcome to your administration panel.</p>
+
+  <div class="cards">
+
+    <div class="card">
+      <h3>Total Users</h3>
+      <div class="value">—</div>
+      <p>Database connection pending</p>
+    </div>
+
+    <div class="card">
+      <h3>Premium Members</h3>
+      <div class="value">—</div>
+      <p>Subscription connection pending</p>
+    </div>
+
+    <div class="card">
+      <h3>Revenue</h3>
+      <div class="value">£—</div>
+      <p>Payment connection pending</p>
+    </div>
+
+    <div class="card">
+      <h3>Advertisements</h3>
+      <div class="value">—</div>
+      <p>Advertising management pending</p>
+    </div>
+
+  </div>
+
+  <div class="note">
+    <strong>Admin controls</strong>
+    <p>
+      User management, Premium subscriptions,
+      payments and advertisements will be connected
+      after the database and payment systems are built.
+    </p>
+  </div>
+
+  <button class="logout" onclick="logout()">Logout</button>
+</div>
+
+<script>
+const loginBox = document.getElementById("login");
+const dashboard = document.getElementById("dashboard");
+const message = document.getElementById("message");
+
+function showDashboard() {
+  loginBox.style.display = "none";
+  dashboard.style.display = "block";
+}
+
+async function checkLogin() {
+  try {
+    const response = await fetch("/api/admin/me", {
+      credentials: "same-origin"
+    });
+
+    if (response.ok) {
+      showDashboard();
+    }
+  } catch (error) {
+    message.textContent = "Cannot connect to server.";
+  }
+}
+
+document.getElementById("loginForm").addEventListener(
+  "submit",
+  async function(event) {
+    event.preventDefault();
+
+    message.textContent = "Checking password...";
+
+    try {
+      const response = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "same-origin",
+        body: JSON.stringify({
+          password: document.getElementById("password").value
+        })
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        message.textContent = "";
+        showDashboard();
+      } else {
+        message.textContent = result.error || "Login failed.";
+      }
+
+    } catch (error) {
+      message.textContent = "Server connection failed.";
+    }
+  }
+);
+
+async function logout() {
+  await fetch("/api/admin/logout", {
+    method: "POST",
+    credentials: "same-origin"
+  });
+
+  dashboard.style.display = "none";
+  loginBox.style.display = "block";
+  document.getElementById("password").value = "";
+}
+
+checkLogin();
+</script>
+
+</body>
+</html>
