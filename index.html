@@ -1,0 +1,242 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CodeShow Studio</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1020;color:#eef2ff;font-family:Arial,sans-serif}
+header{padding:18px 22px;background:#111a30;border-bottom:1px solid #293550}
+header h1{margin:0;font-size:23px}
+header p{color:#9eacc8;margin:7px 0 0;font-size:13px}
+main{max-width:1500px;margin:auto;padding:18px}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px}
+button{border:0;border-radius:8px;padding:11px 15px;background:#263653;color:white;font-weight:bold;cursor:pointer}
+button.primary{background:#6755e8}
+button:hover{filter:brightness(1.2)}
+.panels{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+.panel{background:#131d33;border:1px solid #293550;border-radius:12px;overflow:hidden;min-width:0}
+.panel-head{padding:13px 15px;background:#1b2943;display:flex;justify-content:space-between;align-items:center}
+.panel-head strong{font-size:14px}
+.panel-head span{font-size:11px;color:#9eacc8}
+textarea,.typing{width:100%;height:350px;resize:vertical;background:#080e1b;color:#b9e6ff;border:0;outline:0;padding:16px;font:13px/1.65 monospace;white-space:pre;overflow:auto}
+.typing{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
+.output-panel{grid-column:1/-1}
+iframe{width:100%;height:360px;background:white;border:0;display:block}
+.settings{display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:#c5d0e7;font-size:13px;margin:12px 0 17px}
+input[type=range]{width:130px}
+.status{color:#a8b7d5;font-size:12px;margin-left:auto}
+@media(max-width:750px){
+ main{padding:10px}
+ .panels{grid-template-columns:1fr}
+ .output-panel{grid-column:auto}
+ textarea,.typing{height:270px}
+ iframe{height:320px}
+ header h1{font-size:20px}
+}
+</style>
+</head>
+<body>
+<header>
+ <h1>⌨️ CodeShow Studio</h1>
+ <p>Write code · Watch it type · See the live result</p>
+</header>
+
+<main>
+ <div class="toolbar">
+  <button class="primary" id="start">▶ Start typing</button>
+  <button id="pause">Ⅱ Pause</button>
+  <button id="restart">↻ Restart</button>
+  <button id="run">▶ Run full code</button>
+  <button id="refresh">⟳ Refresh output</button>
+ </div>
+
+ <div class="settings">
+  <label>Typing speed:
+   <input id="speed" type="range" min="5" max="150" value="35">
+   <span id="speedValue">35 ms</span>
+  </label>
+  <label><input id="cursor" type="checkbox" checked> Show cursor</label>
+  <button id="clear">Clear editor</button>
+  <span class="status" id="status">Ready</span>
+ </div>
+
+ <div class="panels">
+  <section class="panel">
+   <div class="panel-head">
+    <strong>01 · CODE EDITOR</strong><span>Edit your HTML here</span>
+   </div>
+   <textarea id="editor" spellcheck="false"><!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+  background: #10182b;
+  color: white;
+  font-family: Arial;
+  text-align: center;
+  padding-top: 80px;
+}
+.ball {
+  width: 70px;
+  height: 70px;
+  background: #7c5cff;
+  border-radius: 50%;
+  margin: 35px auto;
+  animation: bounce 1s infinite alternate;
+}
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-70px); }
+}
+</style>
+</head>
+<body>
+<h1>Hello, World!</h1>
+<p>Welcome to CodeShow Studio.</p>
+<div class="ball"></div>
+</body>
+</html></textarea>
+  </section>
+
+  <section class="panel">
+   <div class="panel-head">
+    <strong>02 · TYPING ANIMATION</strong><span>Recording view</span>
+   </div>
+   <pre class="typing" id="typing"></pre>
+  </section>
+
+  <section class="panel output-panel" id="outputPanel">
+   <div class="panel-head">
+    <strong>03 · LIVE OUTPUT</strong>
+    <button id="fullscreen">⛶ Full screen</button>
+   </div>
+   <iframe id="preview" title="Code output" sandbox="allow-scripts"></iframe>
+  </section>
+ </div>
+</main>
+
+<script>
+const editor = document.getElementById("editor");
+const typing = document.getElementById("typing");
+const preview = document.getElementById("preview");
+const speed = document.getElementById("speed");
+const statusText = document.getElementById("status");
+
+let position = 0;
+let timer = null;
+let running = false;
+let lastPreview = 0;
+
+function showPreview(code) {
+  preview.srcdoc = code;
+}
+
+function stopTyping() {
+  if (timer) clearTimeout(timer);
+  timer = null;
+  running = false;
+}
+
+function typeNext() {
+  if (!running) return;
+
+  const code = editor.value;
+
+  if (position >= code.length) {
+    stopTyping();
+    statusText.textContent = "Typing complete";
+    showPreview(code);
+    return;
+  }
+
+  position++;
+  typing.textContent = code.slice(0, position);
+
+  // Update output while the code is being typed.
+  if (position - lastPreview > 12 ||
+      code[position - 1] === "\n" ||
+      position === code.length) {
+    showPreview(code.slice(0, position));
+    lastPreview = position;
+  }
+
+  timer = setTimeout(typeNext, Number(speed.value));
+}
+
+document.getElementById("start").onclick = () => {
+  if (running) return;
+  if (position >= editor.value.length) position = 0;
+  running = true;
+  statusText.textContent = "Typing...";
+  typeNext();
+};
+
+document.getElementById("pause").onclick = () => {
+  stopTyping();
+  statusText.textContent = "Paused";
+};
+
+document.getElementById("restart").onclick = () => {
+  stopTyping();
+  position = 0;
+  lastPreview = 0;
+  typing.textContent = "";
+  showPreview("");
+  statusText.textContent = "Restarted";
+};
+
+document.getElementById("run").onclick = () => {
+  stopTyping();
+  showPreview(editor.value);
+  statusText.textContent = "Full code running";
+};
+
+document.getElementById("refresh").onclick = () => {
+  showPreview(editor.value);
+  statusText.textContent = "Output refreshed";
+};
+
+document.getElementById("clear").onclick = () => {
+  stopTyping();
+  editor.value = "";
+  typing.textContent = "";
+  position = 0;
+  showPreview("");
+  statusText.textContent = "Editor cleared";
+};
+
+speed.oninput = () => {
+  document.getElementById("speedValue").textContent =
+    speed.value + " ms";
+};
+
+document.getElementById("cursor").onchange = event => {
+  typing.style.borderRight = event.target.checked
+    ? "2px solid #7c5cff"
+    : "none";
+};
+
+document.getElementById("fullscreen").onclick = () => {
+  const panel = document.getElementById("outputPanel");
+  if (!document.fullscreenElement) {
+    panel.requestFullscreen?.();
+  } else {
+    document.exitFullscreen?.();
+  }
+};
+
+editor.addEventListener("input", () => {
+  stopTyping();
+  position = 0;
+  typing.textContent = "";
+  statusText.textContent = "Code edited";
+});
+ 
+showPreview(editor.value);
+typing.style.borderRight = "2px solid #7c5cff";
+</script>
+</body>
+</html>
