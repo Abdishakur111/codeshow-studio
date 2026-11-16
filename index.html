@@ -5,238 +5,401 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CodeShow Studio</title>
+
 <style>
-*{box-sizing:border-box}
-body{margin:0;background:#0b1020;color:#eef2ff;font-family:Arial,sans-serif}
-header{padding:18px 22px;background:#111a30;border-bottom:1px solid #293550}
-header h1{margin:0;font-size:23px}
-header p{color:#9eacc8;margin:7px 0 0;font-size:13px}
-main{max-width:1500px;margin:auto;padding:18px}
-.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:16px}
-button{border:0;border-radius:8px;padding:11px 15px;background:#263653;color:white;font-weight:bold;cursor:pointer}
-button.primary{background:#6755e8}
-button:hover{filter:brightness(1.2)}
-.panels{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-.panel{background:#131d33;border:1px solid #293550;border-radius:12px;overflow:hidden;min-width:0}
-.panel-head{padding:13px 15px;background:#1b2943;display:flex;justify-content:space-between;align-items:center}
-.panel-head strong{font-size:14px}
-.panel-head span{font-size:11px;color:#9eacc8}
-textarea,.typing{width:100%;height:350px;resize:vertical;background:#080e1b;color:#b9e6ff;border:0;outline:0;padding:16px;font:13px/1.65 monospace;white-space:pre;overflow:auto}
-.typing{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}
-.output-panel{grid-column:1/-1}
-iframe{width:100%;height:360px;background:white;border:0;display:block}
-.settings{display:flex;align-items:center;gap:12px;flex-wrap:wrap;color:#c5d0e7;font-size:13px;margin:12px 0 17px}
-input[type=range]{width:130px}
-.status{color:#a8b7d5;font-size:12px;margin-left:auto}
-@media(max-width:750px){
- main{padding:10px}
- .panels{grid-template-columns:1fr}
- .output-panel{grid-column:auto}
- textarea,.typing{height:270px}
- iframe{height:320px}
- header h1{font-size:20px}
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #10131c;
+  color: white;
+  font-family: Arial, sans-serif;
+}
+
+header {
+  padding: 18px;
+  background: #191e2c;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  color: #69d7ff;
+}
+
+button {
+  border: 0;
+  padding: 10px 15px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.premium-btn {
+  background: #ffd166;
+  color: #171717;
+}
+
+main {
+  max-width: 1200px;
+  margin: auto;
+  padding: 18px;
+}
+
+.ad {
+  background: #1b2231;
+  border: 1px dashed #68738b;
+  color: #aeb9ca;
+  text-align: center;
+  padding: 18px;
+  margin: 18px 0;
+  border-radius: 9px;
+  min-height: 65px;
+}
+
+.editor {
+  background: #191e2c;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.tabs button {
+  background: #30394d;
+  color: white;
+}
+
+.tabs button.active {
+  background: #168fc0;
+}
+
+textarea {
+  width: 100%;
+  height: 260px;
+  resize: vertical;
+  background: #090d16;
+  color: #9df3c2;
+  border: 1px solid #38445b;
+  border-radius: 7px;
+  padding: 14px;
+  font-family: monospace;
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.run {
+  background: #27c58b;
+  color: #071b13;
+}
+
+.secondary {
+  background: #39465d;
+  color: white;
+}
+
+iframe {
+  width: 100%;
+  height: 300px;
+  background: white;
+  border: 0;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+
+h2 {
+  margin-top: 30px;
+}
+
+.pricing {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 15px;
+}
+
+.plan {
+  background: #1b2231;
+  border: 1px solid #39465d;
+  padding: 20px;
+  border-radius: 12px;
+}
+
+.plan h3 {
+  color: #69d7ff;
+}
+
+.price {
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.plan button {
+  width: 100%;
+  margin-top: 12px;
+  background: #168fc0;
+  color: white;
+}
+
+.premium-plan {
+  border: 2px solid #ffd166;
+}
+
+footer {
+  text-align: center;
+  padding: 25px;
+  color: #9ba8bc;
 }
 </style>
 </head>
+
 <body>
+
 <header>
- <h1>⌨️ CodeShow Studio</h1>
- <p>Write code · Watch it type · See the live result</p>
+  <div class="logo">CodeShow Studio</div>
+  <button class="premium-btn" onclick="showPremium()">
+    Go Premium
+  </button>
 </header>
 
 <main>
- <div class="toolbar">
-  <button class="primary" id="start">▶ Start typing</button>
-  <button id="pause">Ⅱ Pause</button>
-  <button id="restart">↻ Restart</button>
-  <button id="run">▶ Run full code</button>
-  <button id="refresh">⟳ Refresh output</button>
- </div>
 
- <div class="settings">
-  <label>Typing speed:
-   <input id="speed" type="range" min="5" max="150" value="35">
-   <span id="speedValue">35 ms</span>
-  </label>
-  <label><input id="cursor" type="checkbox" checked> Show cursor</label>
-  <button id="clear">Clear editor</button>
-  <span class="status" id="status">Ready</span>
- </div>
+  <!-- TOP ADVERTISEMENT SPACE -->
+  <div class="ad">
+    Advertisement Space
+    <br>
+    <small>Google AdSense / Direct Advertiser</small>
+  </div>
 
- <div class="panels">
-  <section class="panel">
-   <div class="panel-head">
-    <strong>01 · CODE EDITOR</strong><span>Edit your HTML here</span>
-   </div>
-   <textarea id="editor" spellcheck="false"><!DOCTYPE html>
-<html>
-<head>
-<style>
-body {
-  background: #10182b;
-  color: white;
+  <h2>Code Editor</h2>
+  <p>Write your code and see the result instantly.</p>
+
+  <section class="editor">
+
+    <div class="tabs">
+      <button class="active" onclick="selectTab('html',this)">HTML</button>
+      <button onclick="selectTab('css',this)">CSS</button>
+      <button onclick="selectTab('js',this)">JavaScript</button>
+    </div>
+
+    <textarea id="htmlCode"><h1>Hello World!</h1>
+<p>Welcome to CodeShow Studio.</p>
+<button onclick="alert('It works!')">Click Me</button></textarea>
+
+    <textarea id="cssCode" style="display:none">body {
   font-family: Arial;
   text-align: center;
-  padding-top: 80px;
+  padding: 30px;
+  background: #f0f4ff;
 }
-.ball {
-  width: 70px;
-  height: 70px;
-  background: #7c5cff;
-  border-radius: 50%;
-  margin: 35px auto;
-  animation: bounce 1s infinite alternate;
-}
-@keyframes bounce {
-  from { transform: translateY(0); }
-  to { transform: translateY(-70px); }
-}
-</style>
-</head>
-<body>
-<h1>Hello, World!</h1>
-<p>Welcome to CodeShow Studio.</p>
-<div class="ball"></div>
-</body>
-</html></textarea>
+
+h1 {
+  color: #168fc0;
+}</textarea>
+
+    <textarea id="jsCode" style="display:none">console.log("Welcome to CodeShow Studio!");</textarea>
+
+    <div class="actions">
+      <button class="run" onclick="runCode()">Run Code</button>
+      <button class="secondary" onclick="startTyping()">Start Typing</button>
+      <button class="secondary" onclick="pauseTyping()">Pause</button>
+      <button class="secondary" onclick="restartTyping()">Restart</button>
+      <button class="secondary" onclick="clearEditor()">Clear</button>
+    </div>
+
+    <h3>Live Output</h3>
+    <iframe id="output" title="Live code output" sandbox="allow-scripts"></iframe>
+
   </section>
 
-  <section class="panel">
-   <div class="panel-head">
-    <strong>02 · TYPING ANIMATION</strong><span>Recording view</span>
-   </div>
-   <pre class="typing" id="typing"></pre>
-  </section>
+  <!-- MIDDLE ADVERTISEMENT SPACE -->
+  <div class="ad">
+    Advertisement Space
+    <br>
+    <small>Your business could appear here</small>
+  </div>
 
-  <section class="panel output-panel" id="outputPanel">
-   <div class="panel-head">
-    <strong>03 · LIVE OUTPUT</strong>
-    <button id="fullscreen">⛶ Full screen</button>
-   </div>
-   <iframe id="preview" title="Code output" sandbox="allow-scripts"></iframe>
-  </section>
- </div>
+  <h2>Choose Your Plan</h2>
+
+  <div class="pricing">
+
+    <div class="plan">
+      <h3>Free</h3>
+      <div class="price">£0</div>
+      <p>✓ HTML, CSS and JavaScript editor</p>
+      <p>✓ Live Output</p>
+      <p>✓ Typing animation</p>
+      <p>✓ Advertisements</p>
+      <button onclick="alert('You are using the Free plan.')">
+        Current Free Plan
+      </button>
+    </div>
+
+    <div class="plan premium-plan">
+      <h3>Premium Monthly</h3>
+      <div class="price">£1.99</div>
+      <p>✓ Everything in Free</p>
+      <p>✓ No advertisements</p>
+      <p>✓ Screen Recording</p>
+      <p>✓ Save Projects</p>
+      <p>✓ Console</p>
+      <p>✓ More programming languages</p>
+      <button onclick="showPremium()">
+        Choose Monthly
+      </button>
+    </div>
+
+    <div class="plan premium-plan">
+      <h3>Premium Yearly</h3>
+      <div class="price">£23.88</div>
+      <p>✓ Everything in Premium</p>
+      <p>✓ No advertisements</p>
+      <p>✓ Pay once per year</p>
+      <p>✓ All Premium features</p>
+      <button onclick="showPremium()">
+        Choose Yearly
+      </button>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM ADVERTISEMENT SPACE -->
+  <div class="ad">
+    Advertisement Space
+    <br>
+    <small>Direct advertising opportunities</small>
+  </div>
+
 </main>
 
+<footer>
+  CodeShow Studio © 2026
+</footer>
+
 <script>
-const editor = document.getElementById("editor");
-const typing = document.getElementById("typing");
-const preview = document.getElementById("preview");
-const speed = document.getElementById("speed");
-const statusText = document.getElementById("status");
+let currentTab = "html";
+let typingTimer = null;
+let typingPosition = 0;
+let typingSource = "";
 
-let position = 0;
-let timer = null;
-let running = false;
-let lastPreview = 0;
+function selectTab(tab, button) {
+  currentTab = tab;
 
-function showPreview(code) {
-  preview.srcdoc = code;
+  document.getElementById("htmlCode").style.display =
+    tab === "html" ? "block" : "none";
+
+  document.getElementById("cssCode").style.display =
+    tab === "css" ? "block" : "none";
+
+  document.getElementById("jsCode").style.display =
+    tab === "js" ? "block" : "none";
+
+  document.querySelectorAll(".tabs button").forEach(b => {
+    b.classList.remove("active");
+  });
+
+  button.classList.add("active");
 }
 
-function stopTyping() {
-  if (timer) clearTimeout(timer);
-  timer = null;
-  running = false;
+function runCode() {
+  const html = document.getElementById("htmlCode").value;
+  const css = document.getElementById("cssCode").value;
+  const js = document.getElementById("jsCode").value;
+
+  const result = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>${css}</style>
+    </head>
+    <body>
+      ${html}
+      <script>${js.replace(/<\/script/gi, "<\\/script")}<\/script>
+    </body>
+    </html>
+  `;
+
+  document.getElementById("output").srcdoc = result;
 }
 
-function typeNext() {
-  if (!running) return;
+function startTyping() {
+  pauseTyping();
 
-  const code = editor.value;
+  const editor = document.getElementById(
+    currentTab === "html" ? "htmlCode" :
+    currentTab === "css" ? "cssCode" : "jsCode"
+  );
 
-  if (position >= code.length) {
-    stopTyping();
-    statusText.textContent = "Typing complete";
-    showPreview(code);
-    return;
-  }
-
-  position++;
-  typing.textContent = code.slice(0, position);
-
-  // Update output while the code is being typed.
-  if (position - lastPreview > 12 ||
-      code[position - 1] === "\n" ||
-      position === code.length) {
-    showPreview(code.slice(0, position));
-    lastPreview = position;
-  }
-
-  timer = setTimeout(typeNext, Number(speed.value));
-}
-
-document.getElementById("start").onclick = () => {
-  if (running) return;
-  if (position >= editor.value.length) position = 0;
-  running = true;
-  statusText.textContent = "Typing...";
-  typeNext();
-};
-
-document.getElementById("pause").onclick = () => {
-  stopTyping();
-  statusText.textContent = "Paused";
-};
-
-document.getElementById("restart").onclick = () => {
-  stopTyping();
-  position = 0;
-  lastPreview = 0;
-  typing.textContent = "";
-  showPreview("");
-  statusText.textContent = "Restarted";
-};
-
-document.getElementById("run").onclick = () => {
-  stopTyping();
-  showPreview(editor.value);
-  statusText.textContent = "Full code running";
-};
-
-document.getElementById("refresh").onclick = () => {
-  showPreview(editor.value);
-  statusText.textContent = "Output refreshed";
-};
-
-document.getElementById("clear").onclick = () => {
-  stopTyping();
+  typingSource = editor.value;
+  typingPosition = 0;
   editor.value = "";
-  typing.textContent = "";
-  position = 0;
-  showPreview("");
-  statusText.textContent = "Editor cleared";
-};
 
-speed.oninput = () => {
-  document.getElementById("speedValue").textContent =
-    speed.value + " ms";
-};
+  typingTimer = setInterval(() => {
+    if (typingPosition >= typingSource.length) {
+      pauseTyping();
+      runCode();
+      return;
+    }
 
-document.getElementById("cursor").onchange = event => {
-  typing.style.borderRight = event.target.checked
-    ? "2px solid #7c5cff"
-    : "none";
-};
+    editor.value += typingSource[typingPosition];
+    typingPosition++;
+  }, 25);
+}
 
-document.getElementById("fullscreen").onclick = () => {
-  const panel = document.getElementById("outputPanel");
-  if (!document.fullscreenElement) {
-    panel.requestFullscreen?.();
-  } else {
-    document.exitFullscreen?.();
-  }
-};
+function pauseTyping() {
+  clearInterval(typingTimer);
+  typingTimer = null;
+}
 
-editor.addEventListener("input", () => {
-  stopTyping();
-  position = 0;
-  typing.textContent = "";
-  statusText.textContent = "Code edited";
-});
- 
-showPreview(editor.value);
-typing.style.borderRight = "2px solid #7c5cff";
+function restartTyping() {
+  pauseTyping();
+
+  const editor = document.getElementById(
+    currentTab === "html" ? "htmlCode" :
+    currentTab === "css" ? "cssCode" : "jsCode"
+  );
+
+  editor.value = typingSource;
+  typingPosition = 0;
+}
+
+function clearEditor() {
+  pauseTyping();
+
+  const editor = document.getElementById(
+    currentTab === "html" ? "htmlCode" :
+    currentTab === "css" ? "cssCode" : "jsCode"
+  );
+
+  editor.value = "";
+}
+
+function showPremium() {
+  alert(
+    "Premium subscriptions are coming soon. " +
+    "Payment is not active yet."
+  );
+}
+
+runCode();
 </script>
+
 </body>
 </html>
