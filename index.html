@@ -5,472 +5,500 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CodeShow Studio</title>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  background: #10131c;
-  color: white;
-  font-family: Arial, sans-serif;
-}
-
-header {
-  padding: 18px;
-  background: #191e2c;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.logo {
-  font-size: 22px;
-  font-weight: bold;
-  color: #69d7ff;
-}
-
-button {
-  border: 0;
-  padding: 10px 15px;
-  border-radius: 7px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.premium-btn {
-  background: #ffd166;
-  color: #171717;
-}
-
-main {
-  max-width: 1200px;
-  margin: auto;
-  padding: 18px;
-}
-
-.ad {
-  background: #1b2231;
-  border: 1px dashed #68738b;
-  color: #aeb9ca;
-  text-align: center;
-  padding: 18px;
-  margin: 18px 0;
-  border-radius: 9px;
-  min-height: 65px;
-}
-
-.editor {
-  background: #191e2c;
-  padding: 15px;
-  border-radius: 10px;
-}
-
-.tabs {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 12px;
-}
-
-.tabs button {
-  background: #30394d;
-  color: white;
-}
-
-.tabs button.active {
-  background: #168fc0;
-}
-
-textarea {
-  width: 100%;
-  height: 260px;
-  resize: vertical;
-  background: #090d16;
-  color: #9df3c2;
-  border: 1px solid #38445b;
-  border-radius: 7px;
-  padding: 14px;
-  font-family: monospace;
-  font-size: 14px;
-}
-
-.actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 12px;
-}
-
-.run {
-  background: #27c58b;
-  color: #071b13;
-}
-
-.secondary {
-  background: #39465d;
-  color: white;
-}
-
-iframe {
-  width: 100%;
-  height: 300px;
-  background: white;
-  border: 0;
-  border-radius: 8px;
-  margin-top: 12px;
-}
-
-h2 {
-  margin-top: 30px;
-}
-
-.pricing {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 15px;
-}
-
-.plan {
-  background: #1b2231;
-  border: 1px solid #39465d;
-  padding: 20px;
-  border-radius: 12px;
-}
-
-.plan h3 {
-  color: #69d7ff;
-}
-
-.price {
-  font-size: 28px;
-  font-weight: bold;
-}
-
-.plan button {
-  width: 100%;
-  margin-top: 12px;
-  background: #168fc0;
-  color: white;
-}
-
-.premium-plan {
-  border: 2px solid #ffd166;
-}
-
-footer {
-  text-align: center;
-  padding: 25px;
-  color: #9ba8bc;
-}
+:root{--bg:#0b1020;--panel:#141c30;--panel2:#1b2740;--text:#eef3ff;--muted:#9aa9c4;--blue:#648cff;--border:#293754;--green:#35c98b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer;border:0;border-radius:9px;padding:10px 15px;background:var(--blue);color:white;font-weight:600}
+button:hover{filter:brightness(1.12)}
+button.secondary{background:var(--panel2);border:1px solid var(--border)}
+button.danger{background:#a93650}
+header{height:auto;min-height:66px;padding:14px 4%;display:flex;align-items:center;justify-content:space-between;gap:15px;border-bottom:1px solid var(--border);background:#10182a;flex-wrap:wrap}
+.logo{font-size:21px;font-weight:800}.logo span{color:var(--blue)}
+.header-actions{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+main{max-width:1500px;margin:auto;padding:22px 4%}
+.welcome{display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;margin-bottom:20px}
+h1{font-size:26px;margin:0 0 7px}h2{font-size:18px;margin:0 0 14px}
+p{color:var(--muted);line-height:1.5}
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:13px;padding:17px;margin-bottom:18px}
+.ad{min-height:65px;border:1px dashed #52617e;border-radius:10px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;margin-bottom:18px}
+.auth{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.auth input{width:190px;max-width:100%}
+input,select{background:#0d1527;color:var(--text);border:1px solid var(--border);border-radius:8px;padding:10px;min-width:0}
+.editor-layout{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.tabs button{background:var(--panel2);border:1px solid var(--border)}
+.tabs button.active{background:var(--blue)}
+textarea.editor{width:100%;height:350px;resize:vertical;background:#080e1b;color:#d9e6ff;border:1px solid var(--border);border-radius:9px;padding:14px;font-family:Consolas,monospace;font-size:14px;line-height:1.6;tab-size:2}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+iframe{width:100%;height:350px;background:white;border:0;border-radius:9px}
+.console{height:110px;overflow:auto;background:#080e1b;border:1px solid var(--border);border-radius:8px;padding:10px;color:#b9c8e3;font:12px monospace;white-space:pre-wrap}
+.status{font-size:13px;color:var(--muted);margin-top:8px}
+.account-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.feature{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px}
+.prices{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.price{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:18px}
+.price strong{font-size:25px}
+footer{text-align:center;padding:25px;color:var(--muted);font-size:13px}
+.hidden{display:none!important}
+@media(max-width:850px){.editor-layout{grid-template-columns:1fr}.features{grid-template-columns:1fr 1fr}.prices{grid-template-columns:1fr}}
+@media(max-width:500px){main{padding:16px 12px}.features{grid-template-columns:1fr}.auth input{width:100%}.auth{width:100%}.auth input{flex:1}.welcome h1{font-size:22px}textarea.editor,iframe{height:300px}}
 </style>
- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
-    
 </head>
-
 <body>
 
 <header>
-  <div class="logo">CodeShow Studio</div>
-  <button class="premium-btn" onclick="showPremium()">
-    Go Premium
-  </button>
-</header>
-<section class="auth-box">
-  <h2>Create Account / Login</h2>
-
-  <input
-    type="email"
-    id="authEmail"
-    placeholder="Enter your email"
-  >
-
-  <input
-    type="password"
-    id="authPassword"
-    placeholder="Enter your password"
-  >
-
-  <button onclick="signUp()">Create Account</button>
-  <button onclick="login()">Login</button>
-  <button onclick="logout()">Logout</button>
-
-  <p id="authMessage"></p>
-</section>
-<main>
-
-  <!-- TOP ADVERTISEMENT SPACE -->
-  <div class="ad">
-    Advertisement Space
-    <br>
-    <small>Google AdSense / Direct Advertiser</small>
+  <div class="logo">CodeShow <span>Studio</span></div>
+  <div class="header-actions">
+    <span id="accountStatus">Not signed in</span>
+    <button class="secondary" onclick="showAuth()">Account</button>
+    <button onclick="showPremium()">Go Premium</button>
   </div>
+</header>
 
-  <h2>Code Editor</h2>
-  <p>Write your code and see the result instantly.</p>
-
-  <section class="editor">
-
-    <div class="tabs">
-      <button class="active" onclick="selectTab('html',this)">HTML</button>
-      <button onclick="selectTab('css',this)">CSS</button>
-      <button onclick="selectTab('js',this)">JavaScript</button>
+<main>
+  <section class="welcome">
+    <div>
+      <h1>Build. Run. Create.</h1>
+      <p>Write your code and see your creation come to life.</p>
     </div>
-
-    <textarea id="htmlCode"><h1>Hello World!</h1>
-<p>Welcome to CodeShow Studio.</p>
-<button onclick="alert('It works!')">Click Me</button></textarea>
-
-    <textarea id="cssCode" style="display:none">body {
-  font-family: Arial;
-  text-align: center;
-  padding: 30px;
-  background: #f0f4ff;
-}
-
-h1 {
-  color: #168fc0;
-}</textarea>
-
-    <textarea id="jsCode" style="display:none">console.log("Welcome to CodeShow Studio!");</textarea>
-
-    <div class="actions">
-      <button class="run" onclick="runCode()">Run Code</button>
-      <button class="secondary" onclick="startTyping()">Start Typing</button>
-      <button class="secondary" onclick="pauseTyping()">Pause</button>
-      <button class="secondary" onclick="restartTyping()">Restart</button>
-      <button class="secondary" onclick="clearEditor()">Clear</button>
+    <div class="account-row">
+      <select id="languageSelect" aria-label="Editor language">
+        <option value="html">HTML / CSS / JS</option>
+        <option value="javascript">JavaScript</option>
+      </select>
+      <button class="secondary" onclick="saveProject()">Save Project</button>
     </div>
-
-    <h3>Live Output</h3>
-    <iframe id="output" title="Live code output" sandbox="allow-scripts"></iframe>
-
   </section>
 
-  <!-- MIDDLE ADVERTISEMENT SPACE -->
-  <div class="ad">
-    Advertisement Space
-    <br>
-    <small>Your business could appear here</small>
-  </div>
+  <div class="ad">Advertisement space</div>
 
-  <h2>Choose Your Plan</h2>
+  <section class="panel hidden" id="authPanel">
+    <h2>Your CodeShow account</h2>
+    <p>Create an account or sign in using your email address.</p>
+    <div class="auth">
+      <input id="authEmail" type="email" placeholder="Email address" autocomplete="email">
+      <input id="authPassword" type="password" placeholder="Password" autocomplete="current-password">
+      <button onclick="signUp()">Sign Up</button>
+      <button class="secondary" onclick="signIn()">Log In</button>
+      <button class="danger" onclick="signOut()">Log Out</button>
+    </div>
+    <div class="status" id="authMessage"></div>
+  </section>
 
-  <div class="pricing">
-
-    <div class="plan">
-      <h3>Free</h3>
-      <div class="price">£0</div>
-      <p>✓ HTML, CSS and JavaScript editor</p>
-      <p>✓ Live Output</p>
-      <p>✓ Typing animation</p>
-      <p>✓ Advertisements</p>
-      <button onclick="alert('You are using the Free plan.')">
-        Current Free Plan
-      </button>
+  <section class="editor-layout">
+    <div class="panel">
+      <h2>Code Editor</h2>
+      <div class="tabs">
+        <button id="tabHtml" class="active" onclick="selectTab('html')">HTML</button>
+        <button id="tabCss" onclick="selectTab('css')">CSS</button>
+        <button id="tabJs" onclick="selectTab('js')">JavaScript</button>
+      </div>
+      <textarea id="htmlCode" class="editor" spellcheck="false"><h1>Hello, CodeShow!</h1>
+<p>Start creating something amazing.</p>
+<button onclick="sayHello()">Click me</button></textarea>
+      <textarea id="cssCode" class="editor hidden" spellcheck="false">body {
+  font-family: Arial;
+  text-align: center;
+  padding: 40px;
+  background: #f0f4ff;
+}
+h1 { color: #315edb; }
+button {
+  padding: 12px 20px;
+  background: #315edb;
+  color: white;
+  border: 0;
+  border-radius: 8px;
+}</textarea>
+      <textarea id="jsCode" class="editor hidden" spellcheck="false">function sayHello() {
+  alert("Hello from CodeShow Studio!");
+}</textarea>
+      <div class="toolbar">
+        <button onclick="runCode()">▶ Run Code</button>
+        <button class="secondary" onclick="startTyping()">Start Typing</button>
+        <button class="secondary" onclick="pauseTyping()">Pause</button>
+        <button class="secondary" onclick="restartTyping()">Restart</button>
+        <button class="danger" onclick="clearEditor()">Clear</button>
+      </div>
+      <div class="status" id="editorStatus">Ready to code.</div>
     </div>
 
-    <div class="plan premium-plan">
-      <h3>Premium Monthly</h3>
-      <div class="price">£1.99</div>
-      <p>✓ Everything in Free</p>
-      <p>✓ No advertisements</p>
-      <p>✓ Screen Recording</p>
-      <p>✓ Save Projects</p>
-      <p>✓ Console</p>
-      <p>✓ More programming languages</p>
-      <button onclick="showPremium()">
-        Choose Monthly
-      </button>
+    <div class="panel">
+      <h2>Live Output</h2>
+      <iframe id="preview" title="Code preview" sandbox="allow-scripts"></iframe>
+      <div class="toolbar">
+        <button class="secondary" onclick="runCode()">Refresh Preview</button>
+        <button class="secondary" onclick="clearConsole()">Clear Console</button>
+      </div>
+      <h2 style="margin-top:18px">Console</h2>
+      <div id="consoleOutput" class="console">Console is ready.</div>
     </div>
+  </section>
 
-    <div class="plan premium-plan">
-      <h3>Premium Yearly</h3>
-      <div class="price">£23.88</div>
-      <p>✓ Everything in Premium</p>
-      <p>✓ No advertisements</p>
-      <p>✓ Pay once per year</p>
-      <p>✓ All Premium features</p>
-      <button onclick="showPremium()">
-        Choose Yearly
-      </button>
+  <div class="ad">Advertisement space</div>
+
+  <section class="panel">
+    <h2>Studio Features</h2>
+    <div class="features">
+      <div class="feature"><strong>Live Preview</strong><p>See your HTML, CSS and JavaScript output.</p></div>
+      <div class="feature"><strong>Save Projects</strong><p>Save projects in this browser.</p></div>
+      <div class="feature"><strong>Console</strong><p>View messages and errors from your code.</p></div>
+      <div class="feature"><strong>Screen Recording</strong><p>Record your screen on supported browsers.</p></div>
+      <div class="feature"><strong>Multi-language</strong><p>Language options can be expanded with a code execution service.</p></div>
+      <div class="feature"><strong>Responsive Design</strong><p>Use CodeShow on phones, tablets and computers.</p></div>
     </div>
+  </section>
 
-  </div>
+  <section class="panel">
+    <h2>Screen Recording</h2>
+    <p>Screen recording requires browser support and permission. It may not work on every mobile device.</p>
+    <div class="toolbar">
+      <button onclick="startRecording()">Start Recording</button>
+      <button class="danger" onclick="stopRecording()">Stop Recording</button>
+    </div>
+    <div id="recordMessage" class="status">Not recording.</div>
+  </section>
 
-  <!-- BOTTOM ADVERTISEMENT SPACE -->
-  <div class="ad">
-    Advertisement Space
-    <br>
-    <small>Direct advertising opportunities</small>
-  </div>
-
+  <section class="panel">
+    <h2>Choose Your Plan</h2>
+    <div class="prices">
+      <div class="price">
+        <h2>Free</h2>
+        <strong>£0</strong>
+        <p>Editor, live preview and advertisements.</p>
+        <button class="secondary" onclick="selectFree()">Current Free Plan</button>
+      </div>
+      <div class="price">
+        <h2>Premium Monthly</h2>
+        <strong>£1.99</strong><p>per month</p>
+        <p>No ads, recording, projects and premium features.</p>
+        <button onclick="showPremium()">Choose Monthly</button>
+      </div>
+      <div class="price">
+        <h2>Premium Yearly</h2>
+        <strong>£23.88</strong><p>per year</p>
+        <p>Same Premium features, billed annually.</p>
+        <button onclick="showPremium()">Choose Yearly</button>
+      </div>
+    </div>
+    <p id="premiumMessage" class="status">Premium payments are not active yet. Secure Stripe integration is still required.</p>
+  </section>
 </main>
 
-<footer>
-  CodeShow Studio © 2026
-</footer>
+<footer>© 2026 CodeShow Studio. All rights reserved.</footer>
 
 <script>
-let currentTab = "html";
-let typingTimer = null;
-let typingPosition = 0;
-let typingSource = "";
+// 1. SUPABASE CONFIGURATION
+// Use the same Project URL and Publishable Key you already obtained.
+// Never put your Supabase Secret or service_role key in this file.
+const SUPABASE_URL = "PASTE_YOUR_PROJECT_URL_HERE";
+const SUPABASE_KEY = "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
 
-function selectTab(tab, button) {
-  currentTab = tab;
+let supabaseClient = null;
 
-  document.getElementById("htmlCode").style.display =
-    tab === "html" ? "block" : "none";
-
-  document.getElementById("cssCode").style.display =
-    tab === "css" ? "block" : "none";
-
-  document.getElementById("jsCode").style.display =
-    tab === "js" ? "block" : "none";
-
-  document.querySelectorAll(".tabs button").forEach(b => {
-    b.classList.remove("active");
-  });
-
-  button.classList.add("active");
+if (window.supabase &&
+    SUPABASE_URL.startsWith("https://") &&
+    SUPABASE_KEY !== "PASTE_YOUR_PUBLISHABLE_KEY_HERE" &&
+    SUPABASE_URL !== "PASTE_YOUR_PROJECT_URL_HERE") {
+  supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 }
+
+// 2. EDITOR TABS
+let activeTab = "html";
+
+function selectTab(tab) {
+  activeTab = tab;
+  ["html","css","js"].forEach(name => {
+    document.getElementById(name + "Code").classList.toggle("hidden", name !== tab);
+    document.getElementById("tab" + name.charAt(0).toUpperCase() + name.slice(1))
+      .classList.toggle("active", name === tab);
+  });
+}
+
+// 3. LIVE PREVIEW AND CONSOLE
+function logConsole(message) {
+  const output = document.getElementById("consoleOutput");
+  if (output.textContent === "Console is ready.") output.textContent = "";
+  output.textContent += String(message) + "\n";
+  output.scrollTop = output.scrollHeight;
+}
+
+function clearConsole() {
+  document.getElementById("consoleOutput").textContent = "Console is ready.";
+}
+
+window.addEventListener("message", event => {
+  const frame = document.getElementById("preview");
+  if (event.source !== frame.contentWindow) return;
+  if (!event.data || event.data.type !== "codeshow-console") return;
+  logConsole(event.data.message);
+});
 
 function runCode() {
   const html = document.getElementById("htmlCode").value;
   const css = document.getElementById("cssCode").value;
   const js = document.getElementById("jsCode").value;
 
-  const result = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <style>${css}</style>
-    </head>
-    <body>
-      ${html}
-      <script>${js.replace(/<\/script/gi, "<\\/script")}<\/script>
-    </body>
-    </html>
-  `;
+  clearConsole();
 
-  document.getElementById("output").srcdoc = result;
+  const safeScriptStart = "<scr" + "ipt>";
+  const safeScriptEnd = "</scr" + "ipt>";
+
+  const bridge =
+    "const send=(type,args)=>parent.postMessage({type:'codeshow-console',message:Array.from(args).map(x=>{try{return typeof x==='object'?JSON.stringify(x):String(x)}catch(e){return String(x)}}).join(' ')},'*');" +
+    "['log','warn','error','info'].forEach(type=>{const old=console[type];console[type]=(...args)=>{send(type,args);old.apply(console,args)}});" +
+    "window.onerror=(msg)=>{send('error',[msg])};";
+
+  const documentContent =
+    "<!DOCTYPE html><html><head><meta charset='UTF-8'><style>" +
+    css +
+    "</style></head><body>" +
+    html +
+    safeScriptStart + bridge + safeScriptEnd +
+    safeScriptStart + js + safeScriptEnd +
+    "</body></html>";
+
+  document.getElementById("preview").srcdoc = documentContent;
+  document.getElementById("editorStatus").textContent = "Preview updated.";
 }
+
+// 4. CLEAR EDITOR
+function clearEditor() {
+  if (!confirm("Clear all HTML, CSS and JavaScript code?")) return;
+  document.getElementById("htmlCode").value = "";
+  document.getElementById("cssCode").value = "";
+  document.getElementById("jsCode").value = "";
+  runCode();
+}
+
+// 5. TYPING ANIMATION
+let typingTimer = null;
+let typingIndex = 0;
+let typingText = "";
+let typingTarget = null;
 
 function startTyping() {
   pauseTyping();
-
-  const editor = document.getElementById(
-    currentTab === "html" ? "htmlCode" :
-    currentTab === "css" ? "cssCode" : "jsCode"
-  );
-
-  typingSource = editor.value;
-  typingPosition = 0;
-  editor.value = "";
+  typingTarget = document.getElementById(activeTab + "Code");
+  typingText = typingTarget.value;
+  typingTarget.value = "";
+  typingIndex = 0;
 
   typingTimer = setInterval(() => {
-    if (typingPosition >= typingSource.length) {
+    if (typingIndex >= typingText.length) {
       pauseTyping();
-      runCode();
+      document.getElementById("editorStatus").textContent = "Typing completed.";
       return;
     }
-
-    editor.value += typingSource[typingPosition];
-    typingPosition++;
-  }, 25);
+    typingTarget.value += typingText.charAt(typingIndex++);
+  }, 20);
 }
 
 function pauseTyping() {
-  clearInterval(typingTimer);
+  if (typingTimer) clearInterval(typingTimer);
   typingTimer = null;
 }
 
 function restartTyping() {
   pauseTyping();
-
-  const editor = document.getElementById(
-    currentTab === "html" ? "htmlCode" :
-    currentTab === "css" ? "cssCode" : "jsCode"
-  );
-
-  editor.value = typingSource;
-  typingPosition = 0;
+  if (!typingTarget) {
+    typingTarget = document.getElementById(activeTab + "Code");
+    typingText = typingTarget.value;
+  }
+  typingTarget.value = "";
+  typingIndex = 0;
+  startTypingFromSaved();
 }
 
-function clearEditor() {
-  pauseTyping();
-
-  const editor = document.getElementById(
-    currentTab === "html" ? "htmlCode" :
-    currentTab === "css" ? "cssCode" : "jsCode"
-  );
-
-  editor.value = "";
+function startTypingFromSaved() {
+  typingTimer = setInterval(() => {
+    if (typingIndex >= typingText.length) {
+      pauseTyping();
+      return;
+    }
+    typingTarget.value += typingText.charAt(typingIndex++);
+  }, 20);
 }
-  async function signUp() {
-  const email = document.getElementById("authEmail").value;
-  const password = document.getElementById("authPassword").value;
-  const message = document.getElementById("authMessage");
 
-  const { data, error } = await supabaseClient.auth.signUp({
-    email: email,
-    password: password
-  });
+// 6. SAVE PROJECTS IN THIS BROWSER
+function saveProject() {
+  const project = {
+    html: document.getElementById("htmlCode").value,
+    css: document.getElementById("cssCode").value,
+    js: document.getElementById("jsCode").value,
+    savedAt: new Date().toISOString()
+  };
 
-  if (error) {
-    message.textContent = error.message;
-  } else {
-    message.textContent =
-      "Account created! Check your email to confirm.";
+  try {
+    localStorage.setItem("codeshow-project", JSON.stringify(project));
+    document.getElementById("editorStatus").textContent =
+      "Project saved in this browser.";
+  } catch (error) {
+    document.getElementById("editorStatus").textContent =
+      "Could not save project in this browser.";
   }
 }
 
-async function login() {
-  const email = document.getElementById("authEmail").value;
-  const password = document.getElementById("authPassword").value;
-  const message = document.getElementById("authMessage");
-
-  const { data, error } =
-    await supabaseClient.auth.signInWithPassword({
-      email: email,
-      password: password
-    });
-
-  message.textContent = error
-    ? error.message
-    : "Login successful!";
+function loadProject() {
+  try {
+    const saved = localStorage.getItem("codeshow-project");
+    if (!saved) return;
+    const project = JSON.parse(saved);
+    document.getElementById("htmlCode").value = project.html || "";
+    document.getElementById("cssCode").value = project.css || "";
+    document.getElementById("jsCode").value = project.js || "";
+  } catch (error) {
+    console.error("Could not load saved project", error);
+  }
 }
 
-async function logout() {
-  const { error } = await supabaseClient.auth.signOut();
+// 7. SCREEN RECORDING
+let mediaRecorder = null;
+let recordedChunks = [];
+let recordingStream = null;
 
+async function startRecording() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getDisplayMedia) {
+    document.getElementById("recordMessage").textContent =
+      "Screen recording is not supported by this browser.";
+    return;
+  }
+
+  try {
+    recordingStream = await navigator.mediaDevices.getDisplayMedia({
+      video: true,
+      audio: true
+    });
+
+    recordedChunks = [];
+    mediaRecorder = new MediaRecorder(recordingStream);
+
+    mediaRecorder.ondataavailable = event => {
+      if (event.data.size > 0) recordedChunks.push(event.data);
+    };
+
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(recordedChunks, {type: "video/webm"});
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "codeshow-recording.webm";
+      link.click();
+      URL.revokeObjectURL(url);
+      document.getElementById("recordMessage").textContent =
+        "Recording downloaded.";
+      if (recordingStream) {
+        recordingStream.getTracks().forEach(track => track.stop());
+      }
+    };
+
+    mediaRecorder.start();
+    document.getElementById("recordMessage").textContent = "Recording...";
+  } catch (error) {
+    document.getElementById("recordMessage").textContent =
+      "Recording was cancelled or permission was denied.";
+  }
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    mediaRecorder.stop();
+    document.getElementById("recordMessage").textContent =
+      "Preparing your recording...";
+  }
+}
+
+// 8. SUPABASE ACCOUNT
+function showAuth() {
+  document.getElementById("authPanel").classList.toggle("hidden");
+  document.getElementById("authPanel").scrollIntoView({behavior:"smooth"});
+}
+
+function authReady() {
+  if (!supabaseClient) {
+    document.getElementById("authMessage").textContent =
+      "Add your Supabase Project URL and Publishable Key in the configuration section first.";
+    return false;
+  }
+  return true;
+}
+
+async function signUp() {
+  if (!authReady()) return;
+  const email = document.getElementById("authEmail").value.trim();
+  const password = document.getElementById("authPassword").value;
+
+  if (!email || password.length < 6) {
+    document.getElementById("authMessage").textContent =
+      "Enter a valid email and a password with at least 6 characters.";
+    return;
+  }
+
+  const {data, error} = await supabaseClient.auth.signUp({email, password});
+  document.getElementById("authMessage").textContent = error
+    ? error.message
+    : "Account created. Check your email if confirmation is required.";
+  if (data.session) updateAccountStatus(data.session.user);
+}
+
+async function signIn() {
+  if (!authReady()) return;
+  const email = document.getElementById("authEmail").value.trim();
+  const password = document.getElementById("authPassword").value;
+
+  const {data, error} = await supabaseClient.auth.signInWithPassword({
+    email, password
+  });
+
+  document.getElementById("authMessage").textContent = error
+    ? error.message
+    : "Login successful.";
+  if (data.user) updateAccountStatus(data.user);
+}
+
+async function signOut() {
+  if (!authReady()) return;
+  const {error} = await supabaseClient.auth.signOut();
   document.getElementById("authMessage").textContent =
-    error ? error.message : "Logged out successfully.";
+    error ? error.message : "You have signed out.";
+  updateAccountStatus(null);
+}
+
+function updateAccountStatus(user) {
+  document.getElementById("accountStatus").textContent =
+    user ? user.email : "Not signed in";
+}
+
+async function checkSession() {
+  if (!supabaseClient) return;
+  const {data} = await supabaseClient.auth.getSession();
+  updateAccountStatus(data.session ? data.session.user : null);
+
+  supabaseClient.auth.onAuthStateChange((_event, session) => {
+    updateAccountStatus(session ? session.user : null);
+  });
+}
+
+// 9. PRICING
+function selectFree() {
+  document.getElementById("premiumMessage").textContent =
+    "You are using the Free plan. Advertisements may be displayed.";
 }
 
 function showPremium() {
-  alert(
-    "Premium subscriptions are coming soon. " +
-    "Payment is not active yet."
-  );
+  document.getElementById("premiumMessage").textContent =
+    "Premium checkout is not active yet. Stripe subscription checkout and verified backend payment webhooks must be configured before payments can be accepted.";
+  document.getElementById("premiumMessage").scrollIntoView({behavior:"smooth"});
 }
 
+// 10. STARTUP
+loadProject();
 runCode();
+checkSession();
 </script>
-  <script>
-const SUPABASE_URL = "https://vsurzbiesswxpmzjxctw.supabase.co";
-const SUPABASE_KEY = "sb_publishable_ASGDoa6zp-yw1VOZb5wM6g_QL2_cPGQ";
-
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
-);
-</script>
-
 </body>
 </html>
