@@ -168,6 +168,8 @@ footer {
   color: #9ba8bc;
 }
 </style>
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
+    
 </head>
 
 <body>
@@ -399,6 +401,15 @@ function showPremium() {
 }
 
 runCode();
+</script>
+  <script>
+const SUPABASE_URL = "https://vsurzbiesswxpmzjxctw.supabase.co";
+const SUPABASE_KEY = "sb_publishable_ASGDoa6zp-yw1VOZb5wM6g_QL2_cPGQ";
+
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
 </script>
 
 </body>
