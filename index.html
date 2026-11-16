@@ -180,7 +180,27 @@ footer {
     Go Premium
   </button>
 </header>
+<section class="auth-box">
+  <h2>Create Account / Login</h2>
 
+  <input
+    type="email"
+    id="authEmail"
+    placeholder="Enter your email"
+  >
+
+  <input
+    type="password"
+    id="authPassword"
+    placeholder="Enter your password"
+  >
+
+  <button onclick="signUp()">Create Account</button>
+  <button onclick="login()">Login</button>
+  <button onclick="logout()">Logout</button>
+
+  <p id="authMessage"></p>
+</section>
 <main>
 
   <!-- TOP ADVERTISEMENT SPACE -->
