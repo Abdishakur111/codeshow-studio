@@ -13,6 +13,22 @@ const PORT = process.env.PORT || 3000;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// CORS CONFIGURATION
+app.use((req, res, next) => {
+  const allowedOrigin = "https://codeshow-studio.onrender.com";
+
+  res.header("Access-Control-Allow-Origin", allowedOrigin);
+  res.header("Vary", "Origin");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(204);
+  }
+
+  next();
+});
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.static(__dirname));
