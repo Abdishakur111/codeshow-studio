@@ -134,7 +134,35 @@ app.post("/api/contact", async (req, res) => {
     });
   }
 });
+// SITE ACTIVITY API
+app.post("/api/activity", async (req, res) => {
+  try {
+    const { event_type } = req.body;
 
+    const allowedEvents = [
+      "page_view",
+      "project_started",
+      "project_saved"
+    ];
+
+    if (!allowedEvents.includes(event_type)) {
+      return res.status(400).json({
+        error: "Invalid activity type"
+      });
+    }
+
+    const { error } = await supabase
+      .from("site_activity")
+      .insert([{ event_type }]);
+
+    if (error) throw error;
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Activity error:", error.message);
+    res.status(500).json({ error: "Could not save activity" });
+  }
+});
 // ADMIN LOGIN
 app.post("/api/admin/login", loginLimit, (req, res) => {
   const { password } = req.body;
