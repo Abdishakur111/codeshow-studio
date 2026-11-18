@@ -535,6 +535,54 @@ footer {
   }
 }
 
+/* Contact Form */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.contact-form label {
+  color: #c7d2fe;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 15px;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  background: #0b1222;
+  color: #ffffff;
+  font: inherit;
+  outline: none;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-color: #6385ff;
+  box-shadow: 0 0 0 3px rgba(99,133,255,.15);
+}
+
+.contact-form textarea {
+  resize: vertical;
+  min-height: 140px;
+}
+
+.contact-form button {
+  padding: 15px 22px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg,#527dff,#8255e8);
+  color: white;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
 
 </style>
 </head>
@@ -697,18 +745,52 @@ button {
   </p>
 </section>
 
+
 <section class="panel" id="contact">
   <h2>Contact Us</h2>
-  <p>
-    Have a question or need help with CodeShow Studio?
-    We would love to hear from you.
-  </p>
 
   <p>
-    Get in touch with our team for support,
-    feedback and enquiries.
+    Have a question or need help?
+    Send a message to the CodeShow Studio team.
   </p>
+
+  <form class="contact-form" id="contactForm"
+        action="/api/contact" method="POST">
+
+    <label for="contactName">Your Name</label>
+    <input
+      type="text"
+      id="contactName"
+      name="name"
+      placeholder="Enter your name"
+      required
+      maxlength="80"
+    >
+
+    <label for="contactEmail">Email Address</label>
+    <input
+      type="email"
+      id="contactEmail"
+      name="email"
+      placeholder="Enter your email"
+      required
+      maxlength="254"
+    >
+
+    <label for="contactMessage">Your Message</label>
+    <textarea
+      id="contactMessage"
+      name="message"
+      placeholder="Write your message here..."
+      rows="6"
+      required
+      maxlength="3000"
+    ></textarea>
+
+    <button type="submit">Send Message</button>
+  </form>
 </section>
+
 
 </main>
 
