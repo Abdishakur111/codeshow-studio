@@ -74,6 +74,51 @@ function requireDatabase(req, res, next) {
   next();
 }
 
+// CONTACT FORM
+app.post("/api/contact", async (req, res) => {
+  try {
+    if (!supabase) {
+      return res.status(503).json({
+        error: "Database is not configured"
+      });
+    }
+
+    const { name, email, message } = req.body;
+
+    if (!name || !email || !message) {
+      return res.status(400).json({
+        error: "Please complete all fields"
+      });
+    }
+
+    const { error } = await supabase
+      .from("contact_messages")
+      .insert([{
+        name: name.trim(),
+        email: email.trim(),
+        message: message.trim()
+      }]);
+
+    if (error) {
+      console.error("Contact error:", error);
+      return res.status(500).json({
+        error: "Could not send message"
+      });
+    }
+
+    return res.json({
+      success: true,
+      message: "Message sent successfully"
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      error: "Server error"
+    });
+  }
+});
+
 // ADMIN LOGIN
 app.post("/api/admin/login", loginLimit, (req, res) => {
   const { password } = req.body;
